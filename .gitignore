@@ -1,0 +1,6 @@
+
+*.pyc
+/test/*
+/test*/*
+.vscode/*
+configs/*
