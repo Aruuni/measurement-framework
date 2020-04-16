@@ -23,9 +23,9 @@ def generate_configs(dir):
     steps = list(map(lambda x: round(x, 1), steps))
 
     # Write config into folder
-    for flow in [CC_ALGO1, CC_ALGO2]:
-        config = os.path.join(dir, 'retransmissions_{}.conf'.format(flow)) 
-        line = 'host, {}, {}ms, 0.0, {}\n'.format(flow, RTT, DURATION)
+    for flow_type in [CC_ALGO1, CC_ALGO2]:
+        config = os.path.join(dir, 'retransmissions_{}.conf'.format(flow_type)) 
+        line = 'host, {}, {}ms, 0.0, {}\n'.format(flow_type, RTT, DURATION)
         with open(config, 'w') as config_file:
             for counter in range(5):
                 config_file.write(line)
@@ -33,9 +33,9 @@ def generate_configs(dir):
     # Open file for commands
     with open(RUN_SH, 'w') as run_file:
         # Write commands to run file
-        for flow in [CC_ALGO1, CC_ALGO2]:
+        for flow_type in [CC_ALGO1, CC_ALGO2]:
             for step in steps:
-                run_file.write('python run_mininet.py {}/retransmissions_{}.conf -n "retransmissions_{}_{}" -l {}ms\n'.format(dir, flow, flow, step, step * RTT))
+                run_file.write('python run_mininet.py {}/retransmissions_{}.conf -n "retransmissions_{}_{}" -l {}ms\n'.format(dir, flow_type, flow_type, step, step * RTT))
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -43,16 +43,14 @@ def generate_configs(dir):
 
 def analyze(dir):
     t_sync = 25
-
     output = {}
-
     for path, dirs, files in os.walk(dir):
         if 'csv_data' not in dirs:
             continue
         try:
             split = path.split('/')[-1].split('_')
-            flow = split[-1]
-            buffer = split[-2]
+            buffer = split[-1]
+            flow_type = split[-2]
 
         except Exception as e:
             sys.stderr.write('Skipping directory {}\n{}\n'.format(path, e))
@@ -63,10 +61,10 @@ def analyze(dir):
         if not key in output.keys():
             output[key] = ([], [], [], [])
 
-        if not os.path.exists(os.path.join(path, 'csv_data/retransmissions_interval.csv.gz')):
+        if not os.path.exists(os.path.join(path, 'csv_data', 'retransmissions_interval.csv.gz')):
             sys.stderr.write('Skipping {}\n'.format(path))
 
-        retransmissions = read_csv(os.path.join(path, 'csv_data/retransmissions_interval.csv'), 3)
+        retransmissions = read_csv(os.path.join(path, 'csv_data', 'retransmissions_interval.csv'), 3)
 
         # Convert t_sync to absolute time
         t_sync = t_sync + retransmissions[0][0][0]
@@ -75,36 +73,38 @@ def analyze(dir):
         retrans = 0
         packets_half = 0
         retrans_half = 0
-        for c in retransmissions:
+        for flow_num in retransmissions:
 
             start = 0
 
-            for i,t in enumerate(retransmissions[c][0]):
+            for i,t in enumerate(retransmissions[flow_num][0]):
                 if t > t_sync:
                     break
                 start = i
 
-            packets += sum(retransmissions[c][2][:start])
-            packets_half += sum(retransmissions[c][2][start:])
+            packets += sum(retransmissions[flow_num][2][:start])
+            packets_half += sum(retransmissions[flow_num][2][start:])
 
-            retrans += sum(retransmissions[c][1][:start])
-            retrans_half += sum(retransmissions[c][1][start:])
+            retrans += sum(retransmissions[flow_num][1][:start])
+            retrans_half += sum(retransmissions[flow_num][1][start:])
 
-        # TODO: Change to switch case
-        if flow == 'CC_ALGO1':
+        if flow_type == CC_ALGO1:
             output[key][0].append(float(retrans) / packets)
             output[key][1].append(float(retrans_half) / packets_half)
-        else:
+        elif flow_type == CC_ALGO2:
             output[key][2].append(float(retrans) / packets)
             output[key][3].append(float(retrans_half) / packets_half)
 
-    print('buffersize;bbr;bbrStart;cubic;cubicStart')
+    print(';'.join(['buffersize','{0}','{0}Start','{1}','{1}Start','{0}_std','{1}_std'])).format(CC_ALGO1, CC_ALGO2)
+    
     for key in sorted(output.keys(), key=lambda x: float(x)):
         print(';'.join(map(str, [key,
                                  np.mean(output[key][0]),
                                  np.mean(output[key][1]),
                                  np.mean(output[key][2]),
                                  np.mean(output[key][3]),
+                                 np.std(output[key][0]),
+                                 np.std(output[key][2])
                                  ])))
 
 if __name__ == "__main__":
