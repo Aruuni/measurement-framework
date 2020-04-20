@@ -6,11 +6,12 @@ import argparse
 from helper.csv_writer import read_csv
 
 
-BUFFERSIZE = 0.2
+BUFFERSIZE = 0.24
 RUN_SH = 'run_increasing_rtt.sh'
 CC_ALGO1 = 'cubic'
 CC_ALGO2 = 'bbr2'
 DURATION = 180
+TESTRUNS = 5
 
 
 def generate_configs(dir):
@@ -34,7 +35,8 @@ def generate_configs(dir):
 
             # Write commands to run_file
             buffer = rtt * BUFFERSIZE
-            run_file.write('python run_mininet.py -l {}ms {} -n "rtt_{}"\n'.format(rtt, config, buffer))
+            for i in range(TESTRUNS):
+                run_file.write('python run_mininet.py -l {}ms {} -n "rtt_{}"\n'.format(buffer, config, rtt))
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -81,20 +83,17 @@ def analyze(dir):
         output[rtt][2].append(avg_fairness)
 
     print(';'.join([
-        'rtt', '{0}_share', '{0}_std',
-        '{1}_share', '{1}_std',
-        'avg_fairness', 'avg_fairness_std'
+        'rtt', '{0}_share', '{1}_share', 'avg_fairness', '{0}_std', 'testruns'
     ])).format(CC_ALGO1, CC_ALGO2)
 
     for key in sorted(output.keys(), key=lambda x: float(x)):
         print(';'.join(map(str, [
             key,
             np.average(output[key][0]),
-            np.std(output[key][0]),
             np.average(output[key][1]),
-            np.std(output[key][1]),
             np.average(output[key][2]),
-            np.std(output[key][2]),
+            np.std(output[key][0]),
+            len(output[key][0])
         ])))
 
 

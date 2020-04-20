@@ -9,7 +9,7 @@ import argparse
 
 RTT = 50
 CC_ALGO1 = 'cubic'
-CC_ALGO2 = 'bbr'
+CC_ALGO2 = 'bbr2'
 RUN_SH = 'run_retransmissions.sh'
 DURATION = 120
 
@@ -27,7 +27,7 @@ def generate_configs(dir):
         config = os.path.join(dir, 'retransmissions_{}.conf'.format(flow_type)) 
         line = 'host, {}, {}ms, 0.0, {}\n'.format(flow_type, RTT, DURATION)
         with open(config, 'w') as config_file:
-            for counter in range(5):
+            for i in range(5):
                 config_file.write(line)
 
     # Open file for commands
