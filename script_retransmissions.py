@@ -95,7 +95,7 @@ def analyze(dir):
             output[key][2].append(float(retrans) / packets)
             output[key][3].append(float(retrans_half) / packets_half)
 
-    print(';'.join(['buffersize','{0}','{0}Start','{1}','{1}Start','{0}_std','{1}_std'])).format(CC_ALGO1, CC_ALGO2)
+    print(';'.join(['buffersize','{0}','{0}Start','{1}','{1}Start','std','{0}_testruns', '{1}_testruns'])).format(CC_ALGO1, CC_ALGO2)
     
     for key in sorted(output.keys(), key=lambda x: float(x)):
         print(';'.join(map(str, [key,
@@ -104,7 +104,8 @@ def analyze(dir):
                                  np.mean(output[key][2]),
                                  np.mean(output[key][3]),
                                  np.std(output[key][0]),
-                                 np.std(output[key][2])
+                                 len(output[key][0]),
+                                 len(output[key][2]),
                                  ])))
 
 if __name__ == "__main__":
