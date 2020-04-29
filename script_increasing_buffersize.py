@@ -5,14 +5,16 @@ import os
 import stat
 import numpy as np
 import argparse
+import csv
 
 
 RTT = 50
-RUN_SH = 'run_increasing_buffersize.sh'
-CC_ALGO1 = 'cubic'
-CC_ALGO2 = 'bbr'
+TEST = 'increasing_buffersize'
+RUN_SH = 'run_' + TEST + '.sh'
+CC_ALGO1 = 'bbr'
+CC_ALGO2 = 'bbr2'
 # Comment out CC_ALGO3 if you want to run it for two different algorithms
-CC_ALGO3 = 'bbr2'
+#CC_ALGO3 = 'bbr2'
 DURATION = 180 
 
 
@@ -80,53 +82,60 @@ def analyze(dir):
             output[buffer_size][0].append(np.mean(throughput[0][1]) / np.mean(throughput[3][1]))
             output[buffer_size][1].append(np.mean(throughput[1][1]) / np.mean(throughput[3][1]))
             output[buffer_size][2].append(np.mean(throughput[2][1]) / np.mean(throughput[3][1]))
+            result_file_name = 'result_{}_{}_{}_{}.csv'.format(TEST, CC_ALGO1, CC_ALGO2, CC_ALGO3)
         else:
             # Divide throughput of flows by aggregated throughput
             output[buffer_size][0].append(np.mean(throughput[0][1]) / np.mean(throughput[2][1]))
             output[buffer_size][1].append(np.mean(throughput[1][1]) / np.mean(throughput[2][1]))
+            result_file_name = 'result_{}_{}_{}.csv'.format(TEST, CC_ALGO1, CC_ALGO2)
 
-    if 'CC_ALGO3' in globals():
-        print('buffersize;{0};{1};{2};fairness;std_{0};std_{1};std_{2};testruns').format(CC_ALGO1, CC_ALGO2, CC_ALGO3)
-    else:
-        print('buffersize;{0};{1};fairness;std_{0};std_{1};testruns').format(CC_ALGO1, CC_ALGO2)
-
-    for buffersize in sorted(output.keys()):
-        cc_algo1_values = output[buffersize][0]
-        cc_algo2_values = output[buffersize][1]          
-
+    with open(result_file_name, 'wb') as result_file:
+        result_writer = csv.writer(result_file, delimiter=';')
         if 'CC_ALGO3' in globals():
-            cc_algo3_values = output[buffersize][2]
-
-            fairness = (np.mean(cc_algo1_values) + np.mean(cc_algo2_values) + np.mean(cc_algo3_values)) ** 2 / 3 / \
-                (np.mean(cc_algo1_values) ** 2 + np.mean(cc_algo2_values) ** 2 + np.mean(cc_algo3_values) ** 2)
-
-            values = [
-                buffersize,
-                np.mean(cc_algo1_values),
-                np.mean(cc_algo2_values),
-                np.mean(cc_algo3_values),
-                fairness,
-                np.std(cc_algo1_values),
-                np.std(cc_algo2_values),
-                np.std(cc_algo3_values),
-                len(output[buffersize][0])
-            ]
-
+            print('buffersize;{0};{1};{2};fairness;std_{0};std_{1};std_{2};testruns').format(CC_ALGO1, CC_ALGO2, CC_ALGO3)
+            result_writer.writerow(['buffersize', CC_ALGO1, CC_ALGO2, CC_ALGO3, 'fairness', 'std_'+CC_ALGO1, 'std_'+CC_ALGO2, 'std_'+CC_ALGO3, 'testruns'])
         else:
-            fairness = (np.mean(cc_algo1_values) + np.mean(cc_algo2_values)) ** 2 / 2 / \
-                   (np.mean(cc_algo1_values) ** 2 + np.mean(cc_algo2_values) ** 2)
+            print('buffersize;{0};{1};fairness;std_{0};std_{1};testruns').format(CC_ALGO1, CC_ALGO2)
+            result_writer.writerow(['buffersize', CC_ALGO1, CC_ALGO2, 'fairness', 'std_'+CC_ALGO1, 'std_'+CC_ALGO2, 'testruns'])
 
-            values = [
-                buffersize,
-                np.mean(cc_algo1_values),
-                np.mean(cc_algo2_values),
-                fairness,
-                np.std(cc_algo1_values),
-                np.std(cc_algo2_values),
-                len(output[buffersize][0])
-            ]
+        for buffersize in sorted(output.keys()):
+            cc_algo1_values = output[buffersize][0]
+            cc_algo2_values = output[buffersize][1]          
 
-        print(';'.join(map(str, values)))
+            if 'CC_ALGO3' in globals():
+                cc_algo3_values = output[buffersize][2]
+
+                fairness = (np.mean(cc_algo1_values) + np.mean(cc_algo2_values) + np.mean(cc_algo3_values)) ** 2 / 3 / \
+                    (np.mean(cc_algo1_values) ** 2 + np.mean(cc_algo2_values) ** 2 + np.mean(cc_algo3_values) ** 2)
+
+                values = [
+                    buffersize,
+                    np.mean(cc_algo1_values),
+                    np.mean(cc_algo2_values),
+                    np.mean(cc_algo3_values),
+                    fairness,
+                    np.std(cc_algo1_values),
+                    np.std(cc_algo2_values),
+                    np.std(cc_algo3_values),
+                    len(output[buffersize][0])
+                ]
+
+            else:
+                fairness = (np.mean(cc_algo1_values) + np.mean(cc_algo2_values)) ** 2 / 2 / \
+                    (np.mean(cc_algo1_values) ** 2 + np.mean(cc_algo2_values) ** 2)
+
+                values = [
+                    buffersize,
+                    np.mean(cc_algo1_values),
+                    np.mean(cc_algo2_values),
+                    fairness,
+                    np.std(cc_algo1_values),
+                    np.std(cc_algo2_values),
+                    len(output[buffersize][0])
+                ]
+
+            print(';'.join(map(str, values)))
+            result_writer.writerow(values)
 
 
 if __name__ == '__main__':
