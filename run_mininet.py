@@ -344,7 +344,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', dest='rtt',
                         default='0ms', help='Initial rtt for all flows. (default 0ms)')
     parser.add_argument('--loss', dest='loss',
-                        default='0%', help='Initial rtt for all flows. (default 0%)')
+                        default='0%', help='Initial loss for all flows. (default 0%)')
     parser.add_argument('-d', dest='directory',
                         default='test/', help='Path to the output directory. (default: test/)')
     parser.add_argument('-s', dest='buffer_size',
