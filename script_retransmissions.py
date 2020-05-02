@@ -5,12 +5,15 @@ import os
 import stat
 import numpy as np
 import argparse
+import csv
 
 
 RTT = 50
+TEST = 'retransmissions'
+RUN_SH = 'run_' + TEST + '.sh'
 CC_ALGO1 = 'cubic'
-CC_ALGO2 = 'bbr2'
-RUN_SH = 'run_retransmissions.sh'
+CC_ALGO2 = 'bbr'
+CC_ALGO3 = 'bbr2'
 DURATION = 120
 
 def generate_configs(dir):
@@ -35,7 +38,8 @@ def generate_configs(dir):
         # Write commands to run file
         for flow_type in [CC_ALGO1, CC_ALGO2]:
             for step in steps:
-                run_file.write('python run_mininet.py {}/retransmissions_{}.conf -n "retransmissions_{}_{}" -l {}ms\n'.format(dir, flow_type, flow_type, step, step * RTT))
+                run_file.write('python run_mininet.py {}/retransmissions_{}.conf -n \
+                    "retransmissions_{}_{}" -l {}ms\n'.format(dir, flow_type, flow_type, step, step * RTT))
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -59,7 +63,7 @@ def analyze(dir):
         key = buffer
 
         if not key in output.keys():
-            output[key] = ([], [], [], [])
+            output[key] = ([], [], [], [], [], [])
 
         if not os.path.exists(os.path.join(path, 'csv_data', 'retransmissions_interval.csv.gz')):
             sys.stderr.write('Skipping {}\n'.format(path))
@@ -94,19 +98,29 @@ def analyze(dir):
         elif flow_type == CC_ALGO2:
             output[key][2].append(float(retrans) / packets)
             output[key][3].append(float(retrans_half) / packets_half)
+        elif flow_type == CC_ALGO2:
+            output[key][2].append(float(retrans) / packets)
+            output[key][3].append(float(retrans_half) / packets_half)
 
-    print(';'.join(['buffersize','{0}','{0}Start','{1}','{1}Start','std','{0}_testruns', '{1}_testruns'])).format(CC_ALGO1, CC_ALGO2)
-    
-    for key in sorted(output.keys(), key=lambda x: float(x)):
-        print(';'.join(map(str, [key,
-                                 np.mean(output[key][0]),
-                                 np.mean(output[key][1]),
-                                 np.mean(output[key][2]),
-                                 np.mean(output[key][3]),
-                                 np.std(output[key][0]),
-                                 len(output[key][0]),
-                                 len(output[key][2]),
-                                 ])))
+    result_file_name = 'result_{}.csv'.format(TEST)
+    with open(result_file_name, 'wb') as result_file:
+        result_writer = csv.writer(result_file, delimiter=';')
+        result_writer.writerow(['buffersize',CC_ALGO1,CC_ALGO1+'Start',CC_ALGO2,CC_ALGO2+'Start',\
+            CC_ALGO3,CC_ALGO3+'Start','std',CC_ALGO1+'_testruns',CC_ALGO2+'_testruns',CC_ALGO3+'_testruns'])
+
+        for key in sorted(output.keys(), key=lambda x: float(x)):
+            result_writer.writerow([key,
+                                    np.mean(output[key][0]),
+                                    np.mean(output[key][1]),
+                                    np.mean(output[key][2]),
+                                    np.mean(output[key][3]),
+                                    np.mean(output[key][4]),
+                                    np.mean(output[key][5]),
+                                    np.std(output[key][0]),
+                                    len(output[key][0]),
+                                    len(output[key][2]),
+                                    len(output[key][4]),
+                                    ])
 
 if __name__ == "__main__":
 
