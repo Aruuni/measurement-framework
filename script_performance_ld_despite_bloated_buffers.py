@@ -9,7 +9,8 @@ import csv
 
 
 RTT = 40
-BANDWIDTH = '128kbps'
+# BANDWIDTH = '128kbps' from cardwells plot, now using default 10Mbit
+BANDWIDTH = 10
 TEST = 'performance_ld_despite_bloated_buffers'
 RUN_SH = 'run_' + TEST + '.sh'
 CC_ALGO = 'bbr'
@@ -22,21 +23,23 @@ def generate_configs(dir):
         os.makedirs(dir)
 
     # Prepare steps 
-    steps = np.logspace(2, 4, 20, endpoint=False)
+    steps = np.logspace(1, 5, 20, endpoint=True)
     #Round after 3 decimal places
     steps = list(map(lambda x: round(x, 1), steps))
         
     # Write config into folder
     config = os.path.join(dir, '{}.conf'.format(TEST))
     with open(config, 'w') as config_file: 
-        for i in range(8):
-            config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, RTT, DURATION))
+        #for i in range(8):
+        config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, RTT, DURATION))
 
     # Open file for commands
     with open(RUN_SH, 'w') as run_file:
         # Write commands to run_file 
         for step in steps:
-            run_file.write('python run_mininet.py {0}/{1}.conf -n "{1}_{2}_{4}" -b {3} -s {4}kb\n'.format(dir, TEST, CC_ALGO, BANDWIDTH, step))
+            # latency = buffersize/BW
+            latency = step/(BANDWIDTH*1000/8)*1000
+            run_file.write('python run_mininet.py {0}/{1}.conf -n "{1}_{2}_buffersize_{3}" -l {4}ms\n'.format(dir, TEST, CC_ALGO, step, latency))
 
     # Make run file executable
     st = os.stat(RUN_SH)
