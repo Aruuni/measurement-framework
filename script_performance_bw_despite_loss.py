@@ -34,7 +34,7 @@ def generate_configs(dir):
     with open(RUN_SH, 'w') as run_file:
         # Write commands to run_file 
         for step in steps:
-            run_file.write('python run_mininet.py {0}/{1}.conf -n "{1}_{2}{3:.3g}" --loss {3}%\n'.format(dir, TEST, CC_ALGO, step))
+            run_file.write('python run_mininet.py {0}/{1}.conf -n "{1}_{2}_{3:.3g}" --loss {3}%\n'.format(dir, TEST, CC_ALGO, step))
 
     # Make run file executable
     st = os.stat(RUN_SH)
