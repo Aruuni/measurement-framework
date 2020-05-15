@@ -99,29 +99,49 @@ def analyze(dir):
         elif flow_type == CC_ALGO2:
             output[key][2].append(float(retrans) / packets)
             output[key][3].append(float(retrans_half) / packets_half)
-        elif flow_type == CC_ALGO2:
-            output[key][2].append(float(retrans) / packets)
-            output[key][3].append(float(retrans_half) / packets_half)
+        elif flow_type == CC_ALGO3:
+            output[key][4].append(float(retrans) / packets)
+            output[key][5].append(float(retrans_half) / packets_half)
 
     result_file_name = 'result_{}.csv'.format(TEST)
     with open(result_file_name, 'wb') as result_file:
         result_writer = csv.writer(result_file, delimiter=';')
-        result_writer.writerow(['buffersize',CC_ALGO1,CC_ALGO1+'Start',CC_ALGO2,CC_ALGO2+'Start',\
-            CC_ALGO3,CC_ALGO3+'Start','std',CC_ALGO1+'_testruns',CC_ALGO2+'_testruns',CC_ALGO3+'_testruns'])
 
-        for key in sorted(output.keys(), key=lambda x: float(x)):
-            result_writer.writerow([key,
-                                    np.mean(output[key][0]),
-                                    np.mean(output[key][1]),
-                                    np.mean(output[key][2]),
-                                    np.mean(output[key][3]),
-                                    np.mean(output[key][4]),
-                                    np.mean(output[key][5]),
-                                    np.std(output[key][0]),
-                                    len(output[key][0]),
-                                    len(output[key][2]),
-                                    len(output[key][4]),
-                                    ])
+        if 'CC_ALGO3' in globals():
+            result_writer.writerow(['buffersize',CC_ALGO1,CC_ALGO1+'Start',CC_ALGO2,CC_ALGO2+'Start',\
+                CC_ALGO3,CC_ALGO3+'Start', 'std'+CC_ALGO1,'std'+CC_ALGO2,'std'+CC_ALGO3, \
+                CC_ALGO1+'_testruns',CC_ALGO2+'_testruns', CC_ALGO3+'_testruns'])
+
+            for key in sorted(output.keys(), key=lambda x: float(x)):
+                result_writer.writerow([key,
+                                        np.mean(output[key][0]),
+                                        np.mean(output[key][1]),
+                                        np.mean(output[key][2]),
+                                        np.mean(output[key][3]),
+                                        np.mean(output[key][4]),
+                                        np.mean(output[key][5]),
+                                        np.std(output[key][1]),
+                                        np.std(output[key][3]),
+                                        np.std(output[key][5]),
+                                        len(output[key][0]),
+                                        len(output[key][2]),
+                                        len(output[key][4]),
+                                        ])
+        else:
+            result_writer.writerow(['buffersize',CC_ALGO1,CC_ALGO1+'Start',CC_ALGO2,CC_ALGO2+'Start',\
+                'std'+CC_ALGO1,'std'+CC_ALGO2,CC_ALGO1+'_testruns',CC_ALGO2+'_testruns'])
+
+            for key in sorted(output.keys(), key=lambda x: float(x)):
+                result_writer.writerow([key,
+                                        np.mean(output[key][0]),
+                                        np.mean(output[key][1]),
+                                        np.mean(output[key][2]),
+                                        np.mean(output[key][3]),
+                                        np.std(output[key][1]),
+                                        np.std(output[key][3]),
+                                        len(output[key][0]),
+                                        len(output[key][2]),
+                                        ])
 
 if __name__ == "__main__":
 
