@@ -71,20 +71,21 @@ def analyze(dir):
         retransmissions = read_csv(os.path.join(path, 'csv_data', 'retransmissions_interval.csv'), 3)
 
         # Convert t_sync to absolute time
+        t_sync = 25
         t_sync = t_sync + retransmissions[0][0][0]
 
         packets = 0
         retrans = 0
         packets_half = 0
         retrans_half = 0
+
+        start = 0
+        for i,t in enumerate(retransmissions[0][0]):
+            if t > t_sync:
+                break
+            start = i
+
         for flow_num in retransmissions:
-
-            start = 0
-
-            for i,t in enumerate(retransmissions[flow_num][0]):
-                if t > t_sync:
-                    break
-                start = i
 
             packets += sum(retransmissions[flow_num][2][:start])
             packets_half += sum(retransmissions[flow_num][2][start:])
