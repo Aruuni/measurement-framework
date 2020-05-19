@@ -13,7 +13,7 @@ RTT = 40
 BANDWIDTH = 10
 TEST = 'performance_ld_despite_bloated_buffers'
 RUN_SH = 'run_' + TEST + '.sh'
-CC_ALGO = 'bbr'
+CC_ALGO_LIST = ['cubic', 'bbr', 'bbr2']
 DURATION = 180 
 
 
@@ -29,18 +29,19 @@ def generate_configs(dir):
     steps = list(map(lambda x: round(x, 1), steps))
         
     # Write config into folder
-    config = os.path.join(dir, '{}.conf'.format(TEST))
-    with open(config, 'w') as config_file: 
-        #for i in range(8):
-        config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, RTT, DURATION))
+    for CC_ALGO in CC_ALGO_LIST:
+        config = os.path.join(dir, '{}_{}.conf'.format(TEST, CC_ALGO))
+        with open(config, 'w') as config_file: 
+            config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, RTT, DURATION))
 
     # Open file for commands
     with open(RUN_SH, 'w') as run_file:
         # Write commands to run_file 
-        for step in steps:
-            # latency = buffersize/BW
-            latency = step/(BANDWIDTH*1000/8)*1000
-            run_file.write('python run_mininet.py {0}/{1}.conf -n "{1}_{2}_buffersize_{3}" -l {4}ms\n'.format(dir, TEST, CC_ALGO, step, latency))
+        for CC_ALGO in CC_ALGO_LIST:
+            for step in steps:
+                # latency = buffersize/BW
+                latency = step/(BANDWIDTH*1000/8)*1000
+                run_file.write('python run_mininet.py {0}/{1}_{2}.conf -n "{1}_{2}_buffersize_{3}" -l {4}ms\n'.format(dir, TEST, CC_ALGO, step, latency))
 
     # Make run file executable
     st = os.stat(RUN_SH)
