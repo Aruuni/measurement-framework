@@ -4,11 +4,13 @@ import stat
 import sys
 import argparse
 from helper.csv_writer import read_csv
+import csv
 
 
 BUFFERSIZE = 0.24
-RUN_SH = 'run_increasing_rtt.sh'
-CC_ALGO1 = 'cubic'
+TEST = 'increasing_rtt'
+RUN_SH = 'run_' + TEST + '.sh'
+CC_ALGO1 = 'bbr'
 CC_ALGO2 = 'bbr2'
 DURATION = 180
 TESTRUNS = 5
@@ -28,7 +30,7 @@ def generate_configs(dir):
     with open(RUN_SH, 'w') as run_file:
         for rtt in steps:
             # Write config into folder
-            config = os.path.join(dir, 'rtt_{}ms.conf'.format(rtt))
+            config = os.path.join(dir, TEST+'{}ms.conf'.format(rtt))
             with open(config, 'w') as config_file: 
                 config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO1, rtt, DURATION))
                 config_file.write('host, {}, {}ms, 1, {}\n'.format(CC_ALGO2, rtt, DURATION - 1))
@@ -36,7 +38,7 @@ def generate_configs(dir):
             # Write commands to run_file
             buffer = rtt * BUFFERSIZE
             for i in range(TESTRUNS):
-                run_file.write('python run_mininet.py -l {}ms {} -n "rtt_{}"\n'.format(buffer, config, rtt))
+                run_file.write('python run_mininet.py -l {}ms {} -n "increasing_rtt_{}_{}_{}"\n'.format(buffer, config, CC_ALGO1, CC_ALGO2, rtt))
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -82,19 +84,21 @@ def analyze(dir):
         output[rtt][1].append(cc_algo2_share)
         output[rtt][2].append(avg_fairness)
 
-    print(';'.join([
-        'rtt', '{0}_share', '{1}_share', 'avg_fairness', '{0}_std', 'testruns'
-    ])).format(CC_ALGO1, CC_ALGO2)
+    result_file_name = 'result_{}_{}_{}.csv'.format(TEST, CC_ALGO1, CC_ALGO2)
+    with open(result_file_name, 'wb') as result_file:
+        result_writer = csv.writer(result_file, delimiter=';')
+        result_writer.writerow(['rtt', CC_ALGO1+'_share', CC_ALGO2+'_share', 'avg_fairness', 'stdev', 'testruns'])
 
-    for key in sorted(output.keys(), key=lambda x: float(x)):
-        print(';'.join(map(str, [
-            key,
-            np.average(output[key][0]),
-            np.average(output[key][1]),
-            np.average(output[key][2]),
-            np.std(output[key][0]),
-            len(output[key][0])
-        ])))
+        for key in sorted(output.keys(), key=lambda x: float(x)):
+            values = [
+                key,
+                np.average(output[key][0]),
+                np.average(output[key][1]),
+                np.average(output[key][2]),
+                np.std(output[key][0]),
+                len(output[key][0])
+            ]
+            result_writer.writerow(values)
 
 
 if __name__ == "__main__":
