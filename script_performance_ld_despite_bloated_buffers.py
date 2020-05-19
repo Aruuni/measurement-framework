@@ -23,8 +23,9 @@ def generate_configs(dir):
         os.makedirs(dir)
 
     # Prepare steps 
-    steps = np.logspace(1, 5, 20, endpoint=True)
-    #Round after 3 decimal places
+    # Linear scale, but more points in the first part wanted
+    steps = np.logspace(1, 4, 20, endpoint=True)
+    # Round after 3 decimal places
     steps = list(map(lambda x: round(x, 1), steps))
         
     # Write config into folder
