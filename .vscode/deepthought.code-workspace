@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"uri": "vscode-remote://ssh-remote+deepthought/root/measurement-framework"
+		}
+	],
+	"remoteAuthority": "ssh-remote+deepthought",
+	"settings": {
+		"python.pythonPath": "/usr/bin/python"
+	}
+}
