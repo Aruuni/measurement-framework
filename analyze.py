@@ -386,7 +386,7 @@ def parse_pcap(path, delta_t):
         'Sending Rate': fairness_sending_rate
     }
 
-    bbr_values, cwnd_values = parse_bbr_and_cwnd_values(path)
+    cwnd_values, bbr_values, bbr2_values = parse_bbr_and_cwnd_values(path)
     bbr_total_values, sync_phases, sync_duration = compute_total_values(bbr_values)
     buffer_backlog = parse_buffer_backlog(path)
 
@@ -405,6 +405,7 @@ def parse_pcap(path, delta_t):
                     sending_rate=sending_rate,
                     bbr_values=bbr_values,
                     bbr_total_values=bbr_total_values,
+                    bbr2_values=bbr2_values,
                     cwnd_values=cwnd_values,
                     retransmissions=retransmissions,
                     retransmissions_interval=retransmissions_interval,
@@ -440,8 +441,9 @@ def parse_buffer_backlog(path):
 
 
 def parse_bbr_and_cwnd_values(path):
-    bbr_values = {}
     cwnd_values = {}
+    bbr_values = {}
+    bbr2_values = {}
 
     paths = glob.glob(os.path.join(path, '*.{}*'.format(FLOW_FILE_EXTENSION)))
 
@@ -449,8 +451,9 @@ def parse_bbr_and_cwnd_values(path):
 
     for i, file_path in enumerate(all_files):
 
-        bbr_values[i] = ([], [], [], [], [], [])
         cwnd_values[i] = ([], [], [])
+        bbr_values[i] = ([], [], [], [], [], [])
+        bbr2_values[i] = ([], [], [])
 
         f = open_compressed_file(file_path)
 
@@ -501,8 +504,20 @@ def parse_bbr_and_cwnd_values(path):
                 bbr_values[i][4].append(cwnd_gain)
                 bbr_values[i][5].append(bw * rtt / 1000)
 
+            if split[4] != '':
+                bbr2 = split[4].replace('bbr_bw_lo=', '')\
+                    .replace('bbr_bw_hi=','')
+                bbr2 = bbr2.split(',')
+
+                bbr_bw_lo = int(bbr2[0], 16)
+                bbr_bw_hi = int(bbr2[1], 16)
+
+                bbr2_values[i][0].append(timestamp)
+                bbr2_values[i][1].append(bbr_bw_lo)
+                bbr2_values[i][2].append(bbr_bw_hi)
+
         f.close()
-    return bbr_values, cwnd_values
+    return cwnd_values, bbr_values, bbr2_values
 
 
 def parse_timestamp(string):

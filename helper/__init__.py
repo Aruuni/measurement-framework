@@ -25,6 +25,7 @@ PLOT_TYPES = [
     'rt_prop',
     'window_gain',
     'pacing_gain',
+    'bbr_bw_lo_hi',
 ]
 
 
@@ -46,6 +47,7 @@ CSV_FILE_NAMES = {
     'sending_rate': 'sending_rate.csv',
     'bbr_values': 'bbr_values.csv',
     'bbr_total_values': 'bbr_total_values.csv',
+    'bbr2_values': 'bbr2_values.csv',
     'cwnd_values': 'cwnd_values.csv',
     'retransmissions': 'retransmissions.csv',
     'retransmissions_interval': 'retransmissions_interval.csv',

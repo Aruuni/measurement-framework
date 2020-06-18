@@ -65,6 +65,7 @@ def read_from_csv(path):
         'sending_rate_file': os.path.join(path, CSV_FILE_NAMES['sending_rate']),
         'bbr_values_file': os.path.join(path, CSV_FILE_NAMES['bbr_values']),
         'bbr_total_values_file': os.path.join(path, CSV_FILE_NAMES['bbr_total_values']),
+        'bbr2_values_file': os.path.join(path, CSV_FILE_NAMES['bbr2_values']),
         'cwnd_values_file': os.path.join(path, CSV_FILE_NAMES['cwnd_values']),
         'retransmissions_file': os.path.join(path, CSV_FILE_NAMES['retransmissions']),
         'retransmissions_interval_file': os.path.join(path, CSV_FILE_NAMES['retransmissions_interval']),
@@ -79,6 +80,7 @@ def read_from_csv(path):
     sending_rate = read_csv(data_files['sending_rate_file'])
     bbr_values = read_csv(data_files['bbr_values_file'], 6)
     bbr_total_values = read_csv(data_files['bbr_total_values_file'])
+    bbr2_values = read_csv(data_files['bbr2_values_file'], 3)
     cwnd_values = read_csv(data_files['cwnd_values_file'], 3)
     retransmissions = read_csv(data_files['retransmissions_file'], 1)
     retransmissions_interval = read_csv(data_files['retransmissions_interval_file'], 3)
@@ -92,6 +94,7 @@ def read_from_csv(path):
                     sending_rate=sending_rate,
                     bbr_values=bbr_values,
                     bbr_total_values=bbr_total_values,
+                    bbr2_values=bbr2_values,
                     cwnd_values=cwnd_values,
                     retransmissions=retransmissions,
                     retransmissions_interval=retransmissions_interval,
