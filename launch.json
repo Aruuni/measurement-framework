@@ -1,0 +1,71 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python: analyze.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/analyze.py",
+            "args" : ["-r", "-d", "test"],
+            //"debugOptions": ["Sudo"]
+        },
+
+        {
+            "name": "Python: run_mininet.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/run_mininet.py",
+            "args" : ["example4-bbr2.conf"],
+            //"debugOptions": ["Sudo"]
+        },
+
+        {
+            "name": "Python: script_retransmissions.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/script_retransmissions.py",
+            //"args" : ["create", "configs"]
+            "args" : ["analyze", "test"]
+        },
+
+        {
+            "name": "Python: script_increasing_rtt.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/script_increasing_rtt.py",
+            //"args" : ["create", "configs"]
+            "args" : ["analyze", "test"]
+        },
+
+        {
+            "name": "Python: script_increasing_buffersize.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/script_increasing_buffersize.py",
+            //"args" : ["create", "configs"]
+            "args" : ["analyze", "test"]
+        },
+
+        {
+            "name": "Python: script_performance_bw_despite_loss.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/script_performance_bw_despite_loss.py",
+            //"args" : ["create", "configs"]
+            "args" : ["analyze", "test"]
+        },
+
+        {
+            "name": "Python: script_performance_ld_despite_bloated_buffers.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/script_performance_ld_despite_bloated_buffers.py",
+            //"args" : ["create", "configs"]
+            "args" : ["analyze", "test"]
+        }
+    ]
+}
