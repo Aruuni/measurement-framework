@@ -439,6 +439,15 @@ def parse_buffer_backlog(path):
         f.close()
     return output
 
+def parse_bw(bw):
+    if 'Mbps' in bw:
+        return float(bw.replace('Mbps', '')) * 1000000
+    elif 'Kbps' in bw:
+        return float(bw.replace('Kbps', '')) * 1000
+    elif 'bps' in bw:
+        return float(bw.replace('bps', ''))
+    else:
+        return 0
 
 def parse_bbr_and_cwnd_values(path):
     cwnd_values = {}
@@ -453,7 +462,7 @@ def parse_bbr_and_cwnd_values(path):
 
         cwnd_values[i] = ([], [], [])
         bbr_values[i] = ([], [], [], [], [], [])
-        bbr2_values[i] = ([], [], [])
+        bbr2_values[i] = ([], [], [], [], [], [], [], [])
 
         f = open_compressed_file(file_path)
 
@@ -486,14 +495,7 @@ def parse_bbr_and_cwnd_values(path):
                     pacing_gain = float(bbr[2])
                     cwnd_gain = float(bbr[3])
 
-                if 'Mbps' in bbr[0]:
-                    bw = float(bbr[0].replace('Mbps', '')) * 1000000
-                elif 'Kbps' in bbr[0]:
-                    bw = float(bbr[0].replace('Kbps', '')) * 1000
-                elif 'bps' in bbr[0]:
-                    bw = float(bbr[0].replace('bps', ''))
-                else:
-                    bw = 0
+                bw = parse_bw(bbr[0])
 
                 rtt = float(bbr[1])
 
@@ -505,17 +507,23 @@ def parse_bbr_and_cwnd_values(path):
                 bbr_values[i][5].append(bw * rtt / 1000)
 
             if split[4] != '':
-                bbr2 = split[4].replace('bbr_bw_lo=', '')\
-                    .replace('bbr_bw_hi=','')
+                # bw_hi, bw_lo, mode, phase, inflight_lo, inflight_hi
+                bbr2 = split[4]
                 bbr2 = bbr2.split(',')
 
-                bbr_bw_lo = int(bbr2[0], 16)
-                bbr_bw_hi = int(bbr2[1], 16)
-
                 bbr2_values[i][0].append(timestamp)
-                bbr2_values[i][1].append(bbr_bw_lo)
-                bbr2_values[i][2].append(bbr_bw_hi)
 
+                parameters = ['bw_hi:', 'bw_lo:', 'mode:', 'phase:', 'inflight_lo:', 'inflight_hi:', 'extra_acked:']
+                for index, parameter in enumerate(parameters):
+                    value = 0
+                    for postion in bbr2:
+                        if parameter in postion:
+                            value = postion.replace(parameter,'')
+                            #if parameter == 'bw_hi:' or parameter == 'bw_lo:':
+                            if parameter == 'bw_hi:':
+                                value = parse_bw(value)
+                            break
+                    bbr2_values[i][index+1].append(value)
         f.close()
     return cwnd_values, bbr_values, bbr2_values
 

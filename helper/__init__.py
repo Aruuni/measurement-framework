@@ -25,7 +25,7 @@ PLOT_TYPES = [
     'rt_prop',
     'window_gain',
     'pacing_gain',
-    'bbr_bw_lo_hi',
+    'inflight_lo_hi',
 ]
 
 
