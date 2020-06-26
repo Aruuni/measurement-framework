@@ -519,9 +519,16 @@ def parse_bbr_and_cwnd_values(path):
                     for postion in bbr2:
                         if parameter in postion:
                             value = postion.replace(parameter,'')
-                            #if parameter == 'bw_hi:' or parameter == 'bw_lo:':
-                            if parameter == 'bw_hi:':
+                            if parameter == 'bw_hi:' or parameter == 'bw_lo:':
                                 value = parse_bw(value)
+                                # (2^64-1)*8 = 1.4757395e+20
+                                if value >= 147573952589676000000:
+                                    value = 0
+                            if parameter == 'inflight_lo:' or parameter == 'inflight_hi:':
+                                # 2^31-1 = 4294967295
+                                value = float(value)
+                                if value >= 4294967295:
+                                    value = 0
                             break
                     bbr2_values[i][index+1].append(value)
         f.close()

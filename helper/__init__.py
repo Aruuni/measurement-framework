@@ -25,9 +25,9 @@ PLOT_TYPES = [
     'rt_prop',
     'window_gain',
     'pacing_gain',
+    'bw_lo_hi',
     'inflight_lo_hi',
 ]
-
 
 COMPRESSION_METHODS = ['none', 'gzip', 'bzip2']
 COMPRESSION_EXTENSIONS = {

@@ -143,9 +143,14 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
             has_bbr2 = True
             break
 
+    if 'bw_lo_hi' in plot_only and has_bbr2:
+        plots += [
+            Plot(bbr2_values, plot_bw_lo_hi, 'plot_bw_lo_hi.pdf', 'BBR2 BW Lo and Hi', 'bit', len(bbr2_values)),
+        ]
+
     if 'inflight_lo_hi' in plot_only and has_bbr2:
         plots += [
-            Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'bit', len(bbr2_values)),
+            Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'MSS', len(bbr2_values)),
         ]
 
     if all_plots:
@@ -438,6 +443,19 @@ def plot_diff_inflight_bdp(data, p_plt):
                     break
         ts, diff = filter_smooth((ts, diff), 10, 5)
         p_plt.plot(ts, diff, label='{}'.format(c))
+
+
+def plot_bw_lo_hi(bw_lo_hi, p_plt):
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+    p_plt.plot([], [], label='bw_lo', color='black')
+    p_plt.plot([], [], ':', label='bw_hi', color='black')
+    p_plt.legend()
+
+    for i, c in enumerate(bw_lo_hi):
+        data = bw_lo_hi[c]
+        p_plt.plot(data[0], data[2], color=colors[i % len(colors)])
+        p_plt.plot(data[0], data[1], ':', color=colors[i % len(colors)])
 
 
 def plot_inflight_lo_hi(inflight_lo_hi, p_plt):
