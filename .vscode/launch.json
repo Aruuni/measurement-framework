@@ -10,7 +10,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/analyze.py",
-            "args" : ["-d", "test"],
+            "args" : ["-r", "-d", "test"],
             //"debugOptions": ["Sudo"]
         },
 
@@ -19,7 +19,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/run_mininet.py",
-            "args" : ["example1_cub.conf"],
+            "args" : ["example4-bbr2.conf"],
             //"debugOptions": ["Sudo"]
         },
 
