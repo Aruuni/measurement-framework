@@ -506,7 +506,7 @@ def parse_bbr_and_cwnd_values(path):
                 bbr_values[i][4].append(cwnd_gain)
                 bbr_values[i][5].append(bw * rtt / 1000)
 
-            if split[4] != '':
+            if len(split) > 4 and split[4] != '':
                 # bw_hi, bw_lo, mode, phase, inflight_lo, inflight_hi
                 bbr2 = split[4]
                 bbr2 = bbr2.split(',')
