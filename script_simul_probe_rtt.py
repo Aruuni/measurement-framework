@@ -1,29 +1,42 @@
 from helper.csv_writer import read_csv
 import sys
 import os
+import stat
 import numpy as np
 import argparse
 import ast
 
+TEST = 'performance_bw_despite_loss'
+RUN_SH = 'run_' + TEST + '.sh'
+CC_ALGO = 'bbr'
 DURATION = 120
 
 def generate_configs(dir):
+    # Create directory for config files
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
-    # from 2 to 22
-
+    # Prepare steps 
     steps = np.arange(1, 20, 1).tolist() + np.arange(20, 40, 2).tolist() \
             + np.arange(40, 100, 10).tolist() + np.arange(100, 220, 20).tolist()
 
-    for s in steps:
-        print('sudo python cubic_or_bbr.py -l 500ms '
-              '{0} -n "{1}"'.format(os.path.join(dir, '{}.conf'.format(s)), s))
-        f = open(os.path.join(dir, '{}.conf'.format(s)), 'w')
+    # Open file for commands
+    with open(RUN_SH, 'w') as run_file:
+        config = os.path.join(dir, '{}.conf'.format(TEST))
+        for rtt in steps:
+            # Write config into folder
+            config = os.path.join(dir, TEST+'{}ms.conf'.format(rtt))
+            with open(config, 'w') as config_file: 
+                for i in range(1, 5):
+                    config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, rtt, DURATION))
 
-        f.write('host, bbr, {}ms, 0, {}'.format(s, DURATION))
-        for i in range(1, 5):
-            f.write('\nhost, bbr, {}ms, 0, {}'.format(s, DURATION))
-        f.close()
+            # Write commands to run_file
+            run_file.write('python run_mininet.py -l 500ms {0}/{1} -n "{1}_{2}_{3}\n"'.format(dir, TEST, CC_ALGO, rtt))
+            run_file.write('python analyze.py -r -d test/')
 
+    # Make run file executable
+    st = os.stat(RUN_SH)
+    os.chmod(RUN_SH, st.st_mode | stat.S_IEXEC)
 
 def analyze(dir):
 
