@@ -6,7 +6,7 @@ import numpy as np
 import argparse
 import ast
 
-TEST = 'performance_bw_despite_loss'
+TEST = 'simul_probe_rtt'
 RUN_SH = 'run_' + TEST + '.sh'
 CC_ALGO = 'bbr'
 DURATION = 120
@@ -25,14 +25,14 @@ def generate_configs(dir):
         config = os.path.join(dir, '{}.conf'.format(TEST))
         for rtt in steps:
             # Write config into folder
-            config = os.path.join(dir, TEST+'{}ms.conf'.format(rtt))
+            config = os.path.join(dir, TEST+'_{}_{}.conf'.format(CC_ALGO, rtt))
             with open(config, 'w') as config_file: 
                 for i in range(1, 5):
                     config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, rtt, DURATION))
 
             # Write commands to run_file
-            run_file.write('python run_mininet.py -l 500ms {0}/{1} -n "{1}_{2}_{3}\n"'.format(dir, TEST, CC_ALGO, rtt))
-            run_file.write('python analyze.py -r -d test/')
+            run_file.write('python run_mininet.py -l 500ms {}/{}_{}_{}.conf\n'.format(dir, TEST, CC_ALGO, rtt))
+        run_file.write('python analyze.py -r -d test/\n')
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -52,7 +52,7 @@ def analyze(dir):
             continue
 
         info_file = os.path.join(path, 'csv_data', 'values.info')
-        bbr_file = os.path.join(path, 'csv_data', 'bbr_values.csv')
+        bbr_file = os.path.join(path, 'csv_data', 'bbr_values.csv.gz')
 
         if os.path.exists(info_file) and os.path.exists(bbr_file):
 
