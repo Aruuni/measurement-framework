@@ -11,7 +11,7 @@ BUFFERSIZE = 0.24
 TEST = 'rtt_fairness'
 RUN_SH = 'run_' + TEST + '.sh'
 CC_ALGO = 'bbr'
-DURATION = 50
+DURATION = 120
 TESTRUNS = 5
 
 
@@ -21,7 +21,7 @@ def generate_configs(dir):
         os.makedirs(dir)
 
     # Prepare steps
-    steps = np.arange(10, 110, 10).tolist() 
+    steps = np.arange(10, 210, 10).tolist() 
 
     # Open file for commands
     with open(RUN_SH, 'w') as run_file:
@@ -30,10 +30,11 @@ def generate_configs(dir):
             # Write config into folder
                 config = os.path.join(dir, TEST+'_{}_{}_{}.conf'.format(CC_ALGO, rtt_flow_one, rtt_flow_two))
                 with open(config, 'w') as config_file: 
-                    config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, rtt_flow_one, DURATION - 3))
-                    config_file.write('host, {}, {}ms, 3, {}\n'.format(CC_ALGO, rtt_flow_two, DURATION))
+                    config_file.write('host, {}, {}ms, 0, {}\n'.format(CC_ALGO, rtt_flow_one, DURATION - 1))
+                    config_file.write('host, {}, {}ms, 1, {}\n'.format(CC_ALGO, rtt_flow_two, DURATION))
             
-                run_file.write('python run_mininet.py {}/rtt_fairness_{}_{}_{}.conf\n'.format(dir, CC_ALGO, rtt_flow_one, rtt_flow_two))
+                run_file.write('python run_mininet.py {}/rtt_fairness_{}_{}_{}.conf -l 2000ms\n'.format(dir, CC_ALGO, rtt_flow_one, rtt_flow_two))
+        run_file.write('python analyze.py -r -d test/\n')
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -65,8 +66,9 @@ def analyze(dir):
         flow_1 = 0
         flow_2 = 1
 
-        send_flow_1 = np.average(throughput[flow_1][1])
-        send_flow_2 = np.average(throughput[flow_2][1])
+        # 100 seconds of throuput (from 15 seconds to 115 seconds)
+        send_flow_1 = np.average(throughput[flow_1][1][77:577])
+        send_flow_2 = np.average(throughput[flow_2][1][77:577])
         send_total = send_flow_1 + send_flow_2
         avg_fairness = (send_flow_1 + send_flow_2) ** 2 / (send_flow_1 ** 2 + send_flow_2 ** 2) / 2
 
@@ -84,11 +86,14 @@ def analyze(dir):
     result_file_name = 'result_{}_{}_{}.csv'.format(TEST, CC_ALGO, CC_ALGO)
     with open(result_file_name, 'wb') as result_file:
         result_writer = csv.writer(result_file, delimiter=';')
-        result_writer.writerow(['rtt', CC_ALGO+'flow_1_share', CC_ALGO+'flow_2_share', 'avg_fairness', 'stdev', 'testruns'])
+        result_writer.writerow(['rtt0', 'rtt1', CC_ALGO+'flowshare0', CC_ALGO+'flowshare1', 'avg_fairness', 'stdev', 'testruns'])
 
         for key in sorted(output.keys(), key=lambda x: float(x)):
+            rtt0=int(key/1000)
+            rtt1=int(key-rtt0*1000)
             values = [
-                key,
+                rtt0,
+                rtt1,
                 np.average(output[key][0]),
                 np.average(output[key][1]),
                 np.average(output[key][2]),
