@@ -21,9 +21,11 @@ def generate_configs(dir):
         os.makedirs(dir)
 
     # Prepare steps 
-    steps = np.logspace(-3, 2, 20, endpoint=False)
+    # steps = np.logspace(0, 2, 20, endpoint=False)
     #Round after 3 decimal places
     #steps = list(map(lambda x: round(x, -3), steps))
+    # steps = list(map(lambda x: int(x),steps))
+    steps =[1,2,3,4,5,6,7,10,13,16,20,25,32,40,50,63,80]
         
     # Write config into folder
     config = os.path.join(dir, '{}.conf'.format(TEST))
@@ -35,6 +37,7 @@ def generate_configs(dir):
         # Write commands to run_file 
         for step in steps:
             run_file.write('python run_mininet.py {0}/{1}.conf -n "{1}_{2}_{3:.3g}" --loss {3}%\n'.format(dir, TEST, CC_ALGO, step))
+        run_file.write('python analyze.py -r -d test/\n')
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -64,8 +67,8 @@ def analyze(dir):
 
         # Divide throughput of flows by aggregated throughput
         output[loss_rate].append(np.mean(throughput[0][1]))
-        result_file_name = 'result_{}_{}.csv'.format(TEST, CC_ALGO)
 
+    result_file_name = 'result_{}_{}.csv'.format(TEST, CC_ALGO)
     with open(result_file_name, 'wb') as result_file:
         result_writer = csv.writer(result_file, delimiter=';')
         print('lossrate, {0}, std_{0}, testruns').format(CC_ALGO)

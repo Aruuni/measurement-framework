@@ -15,6 +15,7 @@ TEST = 'performance_ld_despite_bloated_buffers'
 RUN_SH = 'run_' + TEST + '.sh'
 CC_ALGO_LIST = ['cubic', 'bbr', 'bbr2']
 DURATION = 180 
+CC_ALGO = 'bbr'
 
 
 def generate_configs(dir):
@@ -40,8 +41,9 @@ def generate_configs(dir):
         for CC_ALGO in CC_ALGO_LIST:
             for step in steps:
                 # latency = buffersize/BW
-                latency = step/(BANDWIDTH*1000/8)*1000
+                latency = int(step/(BANDWIDTH*1000/8)*1000)
                 run_file.write('python run_mininet.py {0}/{1}_{2}.conf -n "{1}_{2}_buffersize_{3}" -l {4}ms\n'.format(dir, TEST, CC_ALGO, step, latency))
+        run_file.write('python analyze.py -r -d test/\n')
 
     # Make run file executable
     st = os.stat(RUN_SH)
@@ -70,8 +72,8 @@ def analyze(dir):
         latency = read_csv(os.path.join(path, 'csv_data', 'rtt.csv'))
 
         output[buffer_size].append(np.mean(latency[0][1]))
-        result_file_name = 'result_{}_{}.csv'.format(TEST, CC_ALGO)
 
+    result_file_name = 'result_{}_{}.csv'.format(TEST, CC_ALGO)
     with open(result_file_name, 'wb') as result_file:
         result_writer = csv.writer(result_file, delimiter=';')
         result_writer.writerow(['buffersize', CC_ALGO, 'std_'+ CC_ALGO, 'testruns'])
