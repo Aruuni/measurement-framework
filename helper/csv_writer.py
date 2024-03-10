@@ -38,18 +38,18 @@ def write_csv(path, data, compression):
         max_length = max(max_length, len(data[d][0]))
 
         for col in range(0, columns):
-            f.write('{};'.format(d))
-    f.write('\n')
+            f.write('{};'.format(d).encode('utf-8'))
+    f.write('\n'.encode('utf-8'))
 
     for i in range(max_length):
         for j in connections:
             if i < len(j[0]):
                 for col in range(0, columns):
-                    f.write('{};'.format(j[col][i]))
+                    f.write('{};'.format(j[col][i]).encode('utf-8'))
             else:
                 for col in range(0, columns):
-                    f.write(';')
-        f.write('\n')
+                    f.write(';'.encode('utf-8'))
+        f.write('\n'.encode('utf-8'))
     f.close()
 
 
@@ -165,7 +165,7 @@ def write_info_file(path, pcap_data):
                                                                              'Median', 'Mean',
                                                                              'Std Dev', 'Min',
                                                                              'Max'))
-            for c, data in d[1].iteritems():
+            for c, data in d[1].items():
                 value_range = int(len(data[d[2]]) * percentage)
                 if value_range < 1:
                     continue

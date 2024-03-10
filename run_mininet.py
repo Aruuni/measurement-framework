@@ -68,7 +68,7 @@ def parseConfigFile(file):
             rtt = split[2].strip()
             start = float(split[3].strip())
             stop = float(split[4].strip())
-            if algorithm not in cc_algorithms:
+            if algorithm not in cc_algorithms.decode('utf-8'):
                 if algorithm not in unknown_alorithms:
                     unknown_alorithms.append(algorithm)
                 continue
@@ -201,9 +201,9 @@ def run_test(commands, output_directory, name, bandwidth, initial_rtt, initial_l
         if cmd['command'] != 'host':
             continue
         send = net.get('h{}'.format(host_counter))
-        send.setIP('10.1.{}.{}/8'.format(host_counter / 256, host_counter % 256))
+        send.setIP('10.1.{}.{}/8'.format(host_counter // 256, host_counter % 256))
         recv = net.get('r{}'.format(host_counter))
-        recv.setIP('10.2.{}.{}/8'.format(host_counter / 256, host_counter % 256))
+        recv.setIP('10.2.{}.{}/8'.format(host_counter // 256, host_counter % 256))
         host_counter += 1
 
         # setup FQ, algorithm, netem, nc host
@@ -344,7 +344,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', dest='rtt',
                         default='0ms', help='Initial rtt for all flows. (default 0ms)')
     parser.add_argument('--loss', dest='loss',
-                        default='0%', help='Initial loss for all flows. (default 0%)')
+                        default='0%', help='Initial rtt for all flows. (default 0%)')
     parser.add_argument('-d', dest='directory',
                         default='test/', help='Path to the output directory. (default: test/)')
     parser.add_argument('-s', dest='buffer_size',

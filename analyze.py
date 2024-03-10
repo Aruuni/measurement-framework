@@ -71,7 +71,7 @@ def main():
 
     for i, directory in enumerate(paths):
         print('{}/{} Processing {}'.format(i + 1, len(paths), directory))
-        if args.source is 'pcap':
+        if args.source == 'pcap':
 
             pcap_data = parse_pcap(path=directory, delta_t=float(args.delta_t))
 
@@ -79,7 +79,6 @@ def main():
                 string = 'Writing to CSV'
                 if args.compression != COMPRESSION_METHODS[0]:
                     string += ' and compressing with {}'.format(args.compression)
-                print(string)
                 write_to_csv(directory, pcap_data, compression=args.compression)
         else:
             pcap_data = read_from_csv(directory)
@@ -203,7 +202,6 @@ def parse_pcap(path, delta_t):
                 else:
                     inflight[i][1].append(0)
                 inflight_avg[i] = []
-
                 if len(avg_rtt_samples[i]) > 0:
                     avg_rt = sum(avg_rtt_samples[i]) / len(avg_rtt_samples[i])
                     avg_rtt[i][0].append(t)
@@ -259,8 +257,9 @@ def parse_pcap(path, delta_t):
         options = dpkt.tcp.parse_opts(tcp.opts)
         for opt in options:
             if opt[0] == dpkt.tcp.TCP_OPT_TIMESTAMP:
-                ts_val = reduce(lambda x, r: (x << 8) + r, map(ord, opt[1][:4]))
-                ts_ecr = reduce(lambda x, r: (x << 8) + r, map(ord, opt[1][4:]))
+                ts_val = int.from_bytes(opt[1][:4], 'big')
+                ts_ecr = int.from_bytes(opt[1][4:], 'big')
+
 
         if src_port > dst_port:
             # client -> server
@@ -396,7 +395,7 @@ def parse_pcap(path, delta_t):
     throughput[len(throughput)] = total_throughput
     sending_rate[len(sending_rate)] = total_sending_rate
     retransmissions_interval[len(retransmissions_interval)] = total_retransmisions
-
+    
     return PcapData(rtt=round_trips,
                     inflight=inflight,
                     throughput=throughput,
@@ -425,9 +424,11 @@ def parse_buffer_backlog(path):
         output[i] = ([], [])
         f = open_compressed_file(file_path)
         for line in f:
+            if type(line) == bytes:
+                line = line.decode('utf8').replace('\n', '')
             split = line.split(';')
             timestamp = parse_timestamp(split[0])
-            size = split[1].replace('b\n', '')
+            size = split[1].replace('b', '')
             if 'K' in size:
                 size = float(size.replace('K', '')) * 1000
             elif 'M' in size:
@@ -467,7 +468,9 @@ def parse_bbr_and_cwnd_values(path):
         f = open_compressed_file(file_path)
 
         for line in f:
-            split = map(lambda x: x.strip(), line.split(';'))
+            if type(line) == bytes:
+                line = line.decode('utf8').replace('\n', '')
+            split = line.split(';')
 
             timestamp = parse_timestamp(split[0])
             cwnd, ssthresh = 0, 0
@@ -478,8 +481,8 @@ def parse_bbr_and_cwnd_values(path):
                 ssthresh = int(split[2])
 
             cwnd_values[i][0].append(timestamp)
-            cwnd_values[i][1].append(cwnd)
-            cwnd_values[i][2].append(ssthresh)
+            cwnd_values[i][1].append(cwnd * 1600)
+            cwnd_values[i][2].append(ssthresh * 1600)
 
             if split[3] != '':
                 bbr = split[3].replace('bw:', '')\

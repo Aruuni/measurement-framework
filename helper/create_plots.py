@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
-from pcap_data import PcapData
+from helper.pcap_data import PcapData
 from helper import PLOT_PATH, PLOT_TYPES
 from helper.util import print_line
 from helper import TEXT_WIDTH
@@ -64,94 +64,94 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
             Plot((sending_rate, retransmissions), plot_sending_rate, 'plot_sending_rate.pdf', 'Sending Rate', 'bit/s', len(sending_rate))
         ]
 
-    if 'throughput' in plot_only:
-        plots += [
-            Plot((throughput, retransmissions), plot_throughput, 'plot_throughput.pdf', 'Throughput', 'bit/s', len(throughput))
-        ]
+    # if 'throughput' in plot_only:
+    #     plots += [
+    #         Plot((throughput, retransmissions), plot_throughput, 'plot_throughput.pdf', 'Throughput', 'bit/s', len(throughput))
+    #     ]
 
     if 'fairness' in plot_only and len(sending_rate.keys()) > 2:
         plots += [
             Plot(fairness, plot_fairness, 'plot_fairness.pdf', 'Fairness', "Jain's Index", len(fairness))
         ]
 
-    if 'retransmission' in plot_only:
-        plots += [
-            Plot(retransmissions_interval, plot_retransmissions, 'plot_retransmissions.pdf', 'Retransmissions', '#', len(retransmissions_interval)),
-            Plot(retransmissions_interval, plot_retransmission_rate, 'plot_retransmission_rate.pdf', 'Retransmission Rate', '%', 1),
-        ]
+    # if 'retransmission' in plot_only:
+    #     plots += [
+    #         Plot(retransmissions_interval, plot_retransmissions, 'plot_retransmissions.pdf', 'Retransmissions', '#', len(retransmissions_interval)),
+    #         Plot(retransmissions_interval, plot_retransmission_rate, 'plot_retransmission_rate.pdf', 'Retransmission Rate', '%', 1),
+    #     ]
 
-    if 'avg_rtt' in plot_only:
-        plots += [
-            Plot(avg_rtt, plot_avg_rtt, 'plot_avg_rtt.pdf', 'Avg RTT', 'ms', len(avg_rtt))
-        ]
+    # if 'avg_rtt' in plot_only:
+    #     plots += [
+    #         Plot(avg_rtt, plot_avg_rtt, 'plot_avg_rtt.pdf', 'Avg RTT', 'ms', len(avg_rtt))
+    #     ]
 
-    if 'rtt' in plot_only:
-        plots += [
-            Plot(rtt, plot_rtt, 'plot_rtt.pdf', 'RTT', 'ms', len(rtt))
-        ]
+    # if 'rtt' in plot_only:
+    #     plots += [
+    #         Plot(rtt, plot_rtt, 'plot_rtt.pdf', 'RTT', 'ms', len(rtt))
+    #     ]
 
-    if 'inflight' in plot_only:
-        plots += [
-            Plot(inflight, plot_inflight, 'plot_inflight.pdf', 'Inflight', 'bit', len(inflight))
-        ]
+    # if 'inflight' in plot_only:
+    #     plots += [
+    #         Plot(inflight, plot_inflight, 'plot_inflight.pdf', 'Inflight', 'bit', len(inflight))
+    #     ]
 
-    if 'cwnd' in plot_only:
-        plots += [
-            Plot(cwnd_values, plot_cwnd, 'plot_cwnd.pdf', 'CWnd', 'MSS', 2)
-        ]
+    # if 'cwnd' in plot_only:
+    #     plots += [
+    #         Plot((cwnd_values, inflight), plot_cwnd, 'plot_cwnd.pdf', 'CWnd + Inflight', 'MSS', 2)
+    #     ]
 
-    if 'buffer_backlog' in plot_only and len(buffer_backlog) > 0:
-        plots += [
-            Plot((buffer_backlog, retransmissions), plot_buffer_backlog, 'plot_buffer_backlog.pdf', 'Buffer Backlog', 'bit', len(buffer_backlog))
-        ]
+    # if 'buffer_backlog' in plot_only and len(buffer_backlog) > 0:
+    #     plots += [
+    #         Plot((buffer_backlog, retransmissions), plot_buffer_backlog, 'plot_buffer_backlog.pdf', 'Buffer Backlog', 'bit', len(buffer_backlog))
+    #     ]
 
-    has_bbr = False
-    for i in bbr_values:
-        if len(bbr_values[i][0]) > 0:
-            has_bbr = True
-            break
+    # has_bbr = False
+    # for i in bbr_values:
+    #     if len(bbr_values[i][0]) > 0:
+    #         has_bbr = True
+    #         break
 
-    if 'bdp' in plot_only and has_bbr:
-        plots += [
-            Plot(bbr_values, plot_bbr_bdp, 'plot_bbr_bdp.pdf', 'BDP', 'bit', len(bbr_values)),
-            # Plot((inflight, bbr_values), plot_diff_inflight_bdp, 'plot_inflight_div_bdp.pdf', 'Inflight/BDP', ''),
-        ]
+    # if 'bdp' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot(bbr_values, plot_bbr_bdp, 'plot_bbr_bdp.pdf', 'BDP', 'bit', len(bbr_values)),
+    #         # Plot((inflight, bbr_values), plot_diff_inflight_bdp, 'plot_inflight_div_bdp.pdf', 'Inflight/BDP', ''),
+    #     ]
 
-    if 'btl_bw' in plot_only and has_bbr:
-        plots += [
-            Plot((bbr_values, bbr_total_values), plot_bbr_bw, 'plot_bbr_bw.pdf', 'BtlBw', 'bit/s', len(bbr_values)),
-        ]
+    # if 'btl_bw' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot((bbr_values, bbr_total_values), plot_bbr_bw, 'plot_bbr_bw.pdf', 'BtlBw', 'bit/s', len(bbr_values)),
+    #     ]
 
-    if 'rt_prop' in plot_only and has_bbr:
-        plots += [
-            Plot(bbr_values, plot_bbr_rtt, 'plot_bbr_rtt.pdf', 'RTprop', 'ms', len(bbr_values)),
-        ]
+    # if 'rt_prop' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot(bbr_values, plot_bbr_rtt, 'plot_bbr_rtt.pdf', 'RTprop', 'ms', len(bbr_values)),
+    #     ]
 
-    if 'window_gain' in plot_only and has_bbr:
-        plots += [
-            Plot((bbr_values, bbr_total_values), plot_bbr_window, 'plot_bbr_window.pdf', 'Window Gain', '', len(bbr_values)),
-        ]
+    # if 'window_gain' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot((bbr_values, bbr_total_values), plot_bbr_window, 'plot_bbr_window.pdf', 'Window Gain', '', len(bbr_values)),
+    #     ]
 
-    if 'pacing_gain' in plot_only and has_bbr:
-        plots += [
-            Plot((bbr_values, bbr_total_values), plot_bbr_pacing, 'plot_bbr_pacing.pdf', 'Pacing Gain', '', len(bbr_values))
-        ]
+    # if 'pacing_gain' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot((bbr_values, bbr_total_values), plot_bbr_pacing, 'plot_bbr_pacing.pdf', 'Pacing Gain', '', len(bbr_values))
+    #     ]
 
-    has_bbr2 = False
-    for i in bbr2_values:
-        if len(bbr2_values[i][0]) > 0:
-            has_bbr2 = True
-            break
+    # has_bbr2 = False
+    # for i in bbr2_values:
+    #     if len(bbr2_values[i][0]) > 0:
+    #         has_bbr2 = True
+    #         break
 
-    if 'bw_lo_hi' in plot_only and has_bbr2:
-        plots += [
-            Plot(bbr2_values, plot_bw_lo_hi, 'plot_bw_lo_hi.pdf', 'BBR2 BW Lo and Hi', 'bit', len(bbr2_values)),
-        ]
+    # if 'bw_lo_hi' in plot_only and has_bbr2:
+    #     plots += [
+    #         Plot(bbr2_values, plot_bw_lo_hi, 'plot_bw_lo_hi.pdf', 'BBR2 BW Lo and Hi', 'bit', len(bbr2_values)),
+    #     ]
 
-    if 'inflight_lo_hi' in plot_only and has_bbr2:
-        plots += [
-            Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'MSS', len(bbr2_values)),
-        ]
+    # if 'inflight_lo_hi' in plot_only and has_bbr2:
+    #     plots += [
+    #         Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'MSS', len(bbr2_values)),
+    #     ]
 
     if all_plots:
         for plot in plots:
@@ -195,6 +195,11 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
         legend_offset = -0.04
         if i == len(plots) - 1:
             legend_offset = -0.08
+        legend_labels = []
+        for x in range(len(plot.data)):
+            for y in range(len(plot.plot_name.split('+'))):
+                legend_labels.append('Flow {} {}'.format(x, y))
+
         legend = axarr[i].legend(loc='upper left', bbox_to_anchor=(0, legend_offset, 1, 0),
                                  borderaxespad=0, ncol=20,shadow=True, fancybox=True, mode='expand')
 
@@ -359,17 +364,31 @@ def plot_bbr_bdp(bbr, p_plt):
         p_plt.plot(data[0], data[5], label='{}'.format(c))
 
 
-def plot_cwnd(cwnd, p_plt):
+def plot_cwnd(data, p_plt):
     colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-    p_plt.plot([], [], label='CWND', color='black')
-    p_plt.plot([], [], ':', label='SSTHRES', color='black')
-    p_plt.legend()
+    # p_plt.plot([], [], label='Inflight', color='black')
+    # p_plt.plot([], [], label='CWND', color='black')
+    # p_plt.plot([], [], ':', label='SSTHRES', color='black')
+    cwnd_data = data[0]
+    inflight_data = data[1]
+    offset = 0
+    for i, c in enumerate(data[0]):
+        offset += 1
+        cwnd = cwnd_data[c]
+        p_plt.plot(cwnd[0], cwnd[1], color=colors[i % len(colors)])
+        p_plt.plot(cwnd[0], cwnd[2], ':', color=colors[i % len(colors)])
+    for c in inflight_data:
+        inflight = inflight_data[c]
+        #data = filter_smooth(data, 5, 1)
 
-    for i, c in enumerate(cwnd):
-        data = cwnd[c]
-        p_plt.plot(data[0], data[1], color=colors[i % len(colors)])
-        p_plt.plot(data[0], data[2], ':', color=colors[i % len(colors)])
+            # Perform element-wise division for each element of inflight_data[1]
+        inflight_data_divided = [x / 8 for x in inflight[1]]
+
+        # Plot the data
+        #p_plt.plot(inflight_data[0], inflight_data_divided, label='{}'.format(c))
+        p_plt.plot(inflight[0], inflight_data_divided, label='Inflight%s' % c, color=colors[((c % len(colors)) + offset)])
+    p_plt.legend()
 
 
 def plot_retransmissions(ret_interval, p_plt):
