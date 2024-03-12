@@ -7,11 +7,11 @@ import matplotlib
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 from helper.pcap_data import PcapData
 from helper import PLOT_PATH, PLOT_TYPES
 from helper.util import print_line
 from helper import TEXT_WIDTH
-
 PLOT_TOTAL = True
 
 
@@ -59,99 +59,99 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
     t_min = pcap_data.get_min_ts()
     plots = []
 
-    if 'sending_rate' in plot_only:
-        plots += [
-            Plot((sending_rate, retransmissions), plot_sending_rate, 'plot_sending_rate.pdf', 'Sending Rate', 'bit/s', len(sending_rate))
-        ]
-
-    # if 'throughput' in plot_only:
-    #     plots += [
-    #         Plot((throughput, retransmissions), plot_throughput, 'plot_throughput.pdf', 'Throughput', 'bit/s', len(throughput))
-    #     ]
-
     if 'fairness' in plot_only and len(sending_rate.keys()) > 2:
         plots += [
             Plot(fairness, plot_fairness, 'plot_fairness.pdf', 'Fairness', "Jain's Index", len(fairness))
         ]
+    if 'sending_rate' in plot_only:
+        plots += [
+            Plot((sending_rate, retransmissions), plot_sending_rate, 'plot_sending_rate.pdf', 'Sending Rate', 'mbp/s', len(sending_rate))
+        ]
 
-    # if 'retransmission' in plot_only:
-    #     plots += [
-    #         Plot(retransmissions_interval, plot_retransmissions, 'plot_retransmissions.pdf', 'Retransmissions', '#', len(retransmissions_interval)),
-    #         Plot(retransmissions_interval, plot_retransmission_rate, 'plot_retransmission_rate.pdf', 'Retransmission Rate', '%', 1),
-    #     ]
+    if 'throughput' in plot_only:
+        plots += [
+            Plot((throughput, retransmissions), plot_throughput, 'plot_throughput.pdf', 'Throughput', 'mbp/s', len(throughput))
+        ]
 
-    # if 'avg_rtt' in plot_only:
-    #     plots += [
-    #         Plot(avg_rtt, plot_avg_rtt, 'plot_avg_rtt.pdf', 'Avg RTT', 'ms', len(avg_rtt))
-    #     ]
 
-    # if 'rtt' in plot_only:
-    #     plots += [
-    #         Plot(rtt, plot_rtt, 'plot_rtt.pdf', 'RTT', 'ms', len(rtt))
-    #     ]
+    if 'retransmission' in plot_only:
+        plots += [
+            #Plot(retransmissions_interval, plot_retransmissions, 'plot_retransmissions.pdf', 'Retransmissions', '#', len(retransmissions_interval)),
+            Plot(retransmissions_interval, plot_retransmission_rate, 'plot_retransmission_rate.pdf', 'Retransmission Rate', '%', 1),
+        ]
 
-    # if 'inflight' in plot_only:
-    #     plots += [
-    #         Plot(inflight, plot_inflight, 'plot_inflight.pdf', 'Inflight', 'bit', len(inflight))
-    #     ]
+    if 'avg_rtt' in plot_only:
+        plots += [
+            Plot(avg_rtt, plot_avg_rtt, 'plot_avg_rtt.pdf', 'Avg RTT', 'ms', len(avg_rtt))
+        ]
 
-    # if 'cwnd' in plot_only:
-    #     plots += [
-    #         Plot((cwnd_values, inflight), plot_cwnd, 'plot_cwnd.pdf', 'CWnd + Inflight', 'MSS', 2)
-    #     ]
+    if 'rtt' in plot_only:
+        plots += [
+            Plot(rtt, plot_rtt, 'plot_rtt.pdf', 'RTT', 'ms', len(rtt))
+        ]
 
-    # if 'buffer_backlog' in plot_only and len(buffer_backlog) > 0:
-    #     plots += [
-    #         Plot((buffer_backlog, retransmissions), plot_buffer_backlog, 'plot_buffer_backlog.pdf', 'Buffer Backlog', 'bit', len(buffer_backlog))
-    #     ]
+    if 'inflight' in plot_only:
+        plots += [
+            Plot(inflight, plot_inflight, 'plot_inflight.pdf', 'Inflight', 'bit', len(inflight))
+        ]
 
-    # has_bbr = False
-    # for i in bbr_values:
-    #     if len(bbr_values[i][0]) > 0:
-    #         has_bbr = True
-    #         break
+    if 'cwnd' in plot_only:
+        plots += [
+            Plot((cwnd_values, inflight), plot_cwnd, 'plot_cwnd.pdf', 'CWnd + Inflight', 'bytes', 2)
+        ]
 
-    # if 'bdp' in plot_only and has_bbr:
-    #     plots += [
-    #         Plot(bbr_values, plot_bbr_bdp, 'plot_bbr_bdp.pdf', 'BDP', 'bit', len(bbr_values)),
-    #         # Plot((inflight, bbr_values), plot_diff_inflight_bdp, 'plot_inflight_div_bdp.pdf', 'Inflight/BDP', ''),
-    #     ]
+    if 'buffer_backlog' in plot_only and len(buffer_backlog) > 0:
+        plots += [
+            Plot((buffer_backlog, retransmissions), plot_buffer_backlog, 'plot_buffer_backlog.pdf', 'Buffer Backlog', 'bytes', len(buffer_backlog))
+        ]
 
-    # if 'btl_bw' in plot_only and has_bbr:
-    #     plots += [
-    #         Plot((bbr_values, bbr_total_values), plot_bbr_bw, 'plot_bbr_bw.pdf', 'BtlBw', 'bit/s', len(bbr_values)),
-    #     ]
+    has_bbr = False
+    for i in bbr_values:
+        if len(bbr_values[i][0]) > 0:
+            has_bbr = True
+            break
 
-    # if 'rt_prop' in plot_only and has_bbr:
-    #     plots += [
-    #         Plot(bbr_values, plot_bbr_rtt, 'plot_bbr_rtt.pdf', 'RTprop', 'ms', len(bbr_values)),
-    #     ]
+    if 'bdp' in plot_only and has_bbr:
+        plots += [
+            Plot(bbr_values, plot_bbr_bdp, 'plot_bbr_bdp.pdf', 'BDP', 'bit', len(bbr_values)),
+            # Plot((inflight, bbr_values), plot_diff_inflight_bdp, 'plot_inflight_div_bdp.pdf', 'Inflight/BDP', ''),
+        ]
 
-    # if 'window_gain' in plot_only and has_bbr:
-    #     plots += [
-    #         Plot((bbr_values, bbr_total_values), plot_bbr_window, 'plot_bbr_window.pdf', 'Window Gain', '', len(bbr_values)),
-    #     ]
+    if 'btl_bw' in plot_only and has_bbr:
+        plots += [
+            Plot((bbr_values, bbr_total_values), plot_bbr_bw, 'plot_bbr_bw.pdf', 'BtlBw', 'bit/s', len(bbr_values)),
+        ]
 
-    # if 'pacing_gain' in plot_only and has_bbr:
-    #     plots += [
-    #         Plot((bbr_values, bbr_total_values), plot_bbr_pacing, 'plot_bbr_pacing.pdf', 'Pacing Gain', '', len(bbr_values))
-    #     ]
+    if 'rt_prop' in plot_only and has_bbr:
+        plots += [
+            Plot(bbr_values, plot_bbr_rtt, 'plot_bbr_rtt.pdf', 'RTprop', 'ms', len(bbr_values)),
+        ]
 
-    # has_bbr2 = False
-    # for i in bbr2_values:
-    #     if len(bbr2_values[i][0]) > 0:
-    #         has_bbr2 = True
-    #         break
+    if 'window_gain' in plot_only and has_bbr:
+        plots += [
+            Plot((bbr_values, bbr_total_values), plot_bbr_window, 'plot_bbr_window.pdf', 'Window Gain', '', len(bbr_values)),
+        ]
 
-    # if 'bw_lo_hi' in plot_only and has_bbr2:
-    #     plots += [
-    #         Plot(bbr2_values, plot_bw_lo_hi, 'plot_bw_lo_hi.pdf', 'BBR2 BW Lo and Hi', 'bit', len(bbr2_values)),
-    #     ]
+    if 'pacing_gain' in plot_only and has_bbr:
+        plots += [
+            Plot((bbr_values, bbr_total_values), plot_bbr_pacing, 'plot_bbr_pacing.pdf', 'Pacing Gain', '', len(bbr_values))
+        ]
 
-    # if 'inflight_lo_hi' in plot_only and has_bbr2:
-    #     plots += [
-    #         Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'MSS', len(bbr2_values)),
-    #     ]
+    has_bbr2 = False
+    for i in bbr2_values:
+        if len(bbr2_values[i][0]) > 0:
+            has_bbr2 = True
+            break
+
+    if 'bw_lo_hi' in plot_only and has_bbr2:
+        plots += [
+            Plot(bbr2_values, plot_bw_lo_hi, 'plot_bw_lo_hi.pdf', 'BBR2 BW Lo and Hi', 'bit', len(bbr2_values)),
+        ]
+
+    if 'inflight_lo_hi' in plot_only and has_bbr2:
+        plots += [
+            Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'MSS', len(bbr2_values)),
+        ]
 
     if all_plots:
         for plot in plots:
@@ -192,14 +192,12 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
         setup_ax(ax=axarr[i], title=title, label=label, xmin=t_min, xmax=t_max)
         plot.plot_function(plot.data, axarr[i])
 
-        legend_offset = -0.04
+        legend_offset = -0.08
         if i == len(plots) - 1:
-            legend_offset = -0.08
-        legend_labels = []
-        for x in range(len(plot.data)):
-            for y in range(len(plot.plot_name.split('+'))):
-                legend_labels.append('Flow {} {}'.format(x, y))
+            legend_offset = -0.15
 
+        axarr[i].set_xticks(np.arange(t_min, t_max, 10))  # Set the tick positions for the x-axis
+        axarr[i].set_xticks(np.arange(t_min, t_max, 2), minor=True)  # Set minor ticks if needed
         legend = axarr[i].legend(loc='upper left', bbox_to_anchor=(0, legend_offset, 1, 0),
                                  borderaxespad=0, ncol=20,shadow=True, fancybox=True, mode='expand')
 
@@ -219,33 +217,36 @@ def setup_ax(ax, title , label, xmin, xmax):
 
     ax.set_xticks(np.arange(xmin, xmax, grid_tick_maior_interval))
     ax.set_xticks(np.arange(xmin, xmax, grid_tick_minor_interval), minor=True)
-    ax.grid(which='both', color='black', linestyle='dashed', alpha=0.4)
+    ax.grid(which='both', color='black', linestyle='dashed', alpha=0.3)
 
-    ax.set_ylabel(label)
-    ax.set_title(title)
+    ax.set_ylabel(label, fontsize=20)  # Adjust the fontsize as needed
+    ax.set_title(title, fontsize=25)   # Adjust the fontsize as needed
     ax.set_xlim(xmax=xmax, xmin=xmin)
 
+    ax.tick_params(axis='both', which='major', labelsize=23)  # Adjust the fontsize FOR THE SCALES
+    ax.tick_params(axis='both', which='minor', labelsize=15)  # Adjust the fontsize as needed
 
 def plot_throughput(data, p_plt):
     throughput = data[0]
     retransmissions = data[1]
     total = len(throughput) - 1
 
-    if total > 1 and PLOT_TOTAL:
-        data = throughput[total]
-        data = filter_smooth(data, 5, 2)
-        p_plt.plot(data[0], data[1], label='Total', color='#444444')
+    # if total > 1 and PLOT_TOTAL:
+    #     data = throughput[total]
+    #     data = filter_smooth(data, 5, 2)
+    #     p_plt.plot(data[0], data[1], label='Total', color='#444444')
 
     for c in throughput:
         data = throughput[c]
         data = filter_smooth(data, 5, 2)
-
+        throughput_rate_mbps = [x / (10 ** 6) for x in data[1]]
         if int(c) != total:
-            p_plt.plot(data[0], data[1], label='{}'.format(c))
+            p_plt.plot(data[0], throughput_rate_mbps, label='Flow {}'.format(c+1))
 
     for c in retransmissions:
         data = retransmissions[c]
         p_plt.plot(data, np.zeros_like(data), '.', color='red')
+    p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=5))  # Adjust the base value as needed
 
 
 def plot_sending_rate(data, p_plt):
@@ -253,22 +254,22 @@ def plot_sending_rate(data, p_plt):
     retransmissions = data[1]
     total = len(sending_rate) - 1
 
-    if total > 1 and PLOT_TOTAL:
-        data = sending_rate[total]
-        data = filter_smooth(data, 5, 2)
-        p_plt.plot(data[0], data[1], label='Total', color='#444444')
+    # if total > 1 and PLOT_TOTAL:
+    #     data = sending_rate[total]
+    #     data = filter_smooth(data, 5, 2)
+    #     p_plt.plot(data[0], data[1], label='Total', color='#444444')
 
     for c in sending_rate:
-        data = sending_rate[c]
+        data = list(sending_rate[c])
         data = filter_smooth(data, 5, 2)
-
+        sending_rate_mbps = [x / (10 ** 6) for x in data[1]]
         if int(c) != total:
-            p_plt.plot(data[0], data[1], label='{}'.format(c))
+            p_plt.plot(data[0], sending_rate_mbps, label='Flow {}'.format(c+1))
 
     for c in retransmissions:
         data = retransmissions[c]
         p_plt.plot(data, np.zeros_like(data), '.', color='red')
-
+    p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=5))  # Adjust the base value as needed
 
 def plot_fairness(fairness, p_plt):
     for c in fairness:
@@ -281,7 +282,7 @@ def plot_fairness(fairness, p_plt):
 def plot_rtt(rtt, p_plt):
     for c in rtt:
         data = rtt[c]
-        p_plt.plot(data[0], data[1], label='{}'.format(c))
+        p_plt.plot(data[0], data[1], label='Flow {}'.format(c+1))
     p_plt.set_ylim(ymin=0)
 
 
@@ -309,7 +310,8 @@ def plot_buffer_backlog(data, p_plt):
         if len(data[0]) < 1:
             continue
         data = filter_smooth(data, 5, 2)
-        p_plt.plot(data[0], data[1], label='Buffer Backlog {}'.format(c))
+        in_bytes = [x / 8 for x in data[1]]
+        p_plt.plot(data[0], in_bytes, label='Buffer Backlog {}'.format(c))
 
     for c in retransmissions:
         data = retransmissions[c]
@@ -376,18 +378,16 @@ def plot_cwnd(data, p_plt):
     for i, c in enumerate(data[0]):
         offset += 1
         cwnd = cwnd_data[c]
-        p_plt.plot(cwnd[0], cwnd[1], color=colors[i % len(colors)])
+        p_plt.plot(cwnd[0], cwnd[1], label='Flow {} cwnd'.format(c+1), color=colors[i % len(colors)])
         p_plt.plot(cwnd[0], cwnd[2], ':', color=colors[i % len(colors)])
     for c in inflight_data:
         inflight = inflight_data[c]
         #data = filter_smooth(data, 5, 1)
 
-            # Perform element-wise division for each element of inflight_data[1]
         inflight_data_divided = [x / 8 for x in inflight[1]]
 
         # Plot the data
-        #p_plt.plot(inflight_data[0], inflight_data_divided, label='{}'.format(c))
-        p_plt.plot(inflight[0], inflight_data_divided, label='Inflight%s' % c, color=colors[((c % len(colors)) + offset)])
+        p_plt.plot(inflight[0], inflight_data_divided, label='Flow {} inflight'.format(c+1), color=colors[((c % len(colors)) + offset)])
     p_plt.legend()
 
 
@@ -473,8 +473,8 @@ def plot_bw_lo_hi(bw_lo_hi, p_plt):
 
     for i, c in enumerate(bw_lo_hi):
         data = bw_lo_hi[c]
-        p_plt.plot(data[0], data[2], color=colors[i % len(colors)])
-        p_plt.plot(data[0], data[1], ':', color=colors[i % len(colors)])
+        p_plt.plot(data[0], data[2], label='Flow {}'.format(c),color=colors[i % len(colors)])
+        p_plt.plot(data[0], data[1], ':', label='Flow {}'.format(c),color=colors[i % len(colors)])
 
 
 def plot_inflight_lo_hi(inflight_lo_hi, p_plt):
@@ -486,8 +486,8 @@ def plot_inflight_lo_hi(inflight_lo_hi, p_plt):
 
     for i, c in enumerate(inflight_lo_hi):
         data = inflight_lo_hi[c]
-        p_plt.plot(data[0], data[5], color=colors[i % len(colors)])
-        p_plt.plot(data[0], data[6], ':', color=colors[i % len(colors)])
+        p_plt.plot(data[0], data[5], label='Flow {}'.format(c), color=colors[i % len(colors)])
+        p_plt.plot(data[0], data[6], ':', label='Flow {}'.format(c), color=colors[i % len(colors)])
 
 
 def filter_smooth(data, size, repeat=1):

@@ -2,7 +2,7 @@
 *.pyc
 /test/*
 /test*/*
-/synch/*
-/synch*/*
+/results/*
+/results*/*
 # .vscode/*
-result*
+results*
