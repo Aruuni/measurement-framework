@@ -63,6 +63,7 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
         plots += [
             Plot(fairness, plot_fairness, 'plot_fairness.pdf', 'Fairness', "Jain's Index", len(fairness))
         ]
+
     if 'sending_rate' in plot_only:
         plots += [
             Plot((sending_rate, retransmissions), plot_sending_rate, 'plot_sending_rate.pdf', 'Sending Rate', 'mbp/s', len(sending_rate))
@@ -76,7 +77,7 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
 
     if 'retransmission' in plot_only:
         plots += [
-            #Plot(retransmissions_interval, plot_retransmissions, 'plot_retransmissions.pdf', 'Retransmissions', '#', len(retransmissions_interval)),
+            Plot(retransmissions_interval, plot_retransmissions, 'plot_retransmissions.pdf', 'Retransmissions', '#', len(retransmissions_interval)),
             Plot(retransmissions_interval, plot_retransmission_rate, 'plot_retransmission_rate.pdf', 'Retransmission Rate', '%', 1),
         ]
 
@@ -105,53 +106,53 @@ def plot_all(path, pcap_data, plot_only, hide_total=False, all_plots=False):
             Plot((buffer_backlog, retransmissions), plot_buffer_backlog, 'plot_buffer_backlog.pdf', 'Buffer Backlog', 'bytes', len(buffer_backlog))
         ]
 
-    has_bbr = False
-    for i in bbr_values:
-        if len(bbr_values[i][0]) > 0:
-            has_bbr = True
-            break
+    # has_bbr = False
+    # for i in bbr_values:
+    #     if len(bbr_values[i][0]) > 0:
+    #         has_bbr = True
+    #         break
 
-    if 'bdp' in plot_only and has_bbr:
-        plots += [
-            Plot(bbr_values, plot_bbr_bdp, 'plot_bbr_bdp.pdf', 'BDP', 'bit', len(bbr_values)),
-            # Plot((inflight, bbr_values), plot_diff_inflight_bdp, 'plot_inflight_div_bdp.pdf', 'Inflight/BDP', ''),
-        ]
+    # if 'bdp' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot(bbr_values, plot_bbr_bdp, 'plot_bbr_bdp.pdf', 'BDP', 'bit', len(bbr_values)),
+    #         # Plot((inflight, bbr_values), plot_diff_inflight_bdp, 'plot_inflight_div_bdp.pdf', 'Inflight/BDP', ''),
+    #     ]
 
-    if 'btl_bw' in plot_only and has_bbr:
-        plots += [
-            Plot((bbr_values, bbr_total_values), plot_bbr_bw, 'plot_bbr_bw.pdf', 'BtlBw', 'bit/s', len(bbr_values)),
-        ]
+    # if 'btl_bw' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot((bbr_values, bbr_total_values), plot_bbr_bw, 'plot_bbr_bw.pdf', 'BtlBw', 'bit/s', len(bbr_values)),
+    #     ]
 
-    if 'rt_prop' in plot_only and has_bbr:
-        plots += [
-            Plot(bbr_values, plot_bbr_rtt, 'plot_bbr_rtt.pdf', 'RTprop', 'ms', len(bbr_values)),
-        ]
+    # if 'rt_prop' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot(bbr_values, plot_bbr_rtt, 'plot_bbr_rtt.pdf', 'RTprop', 'ms', len(bbr_values)),
+    #     ]
 
-    if 'window_gain' in plot_only and has_bbr:
-        plots += [
-            Plot((bbr_values, bbr_total_values), plot_bbr_window, 'plot_bbr_window.pdf', 'Window Gain', '', len(bbr_values)),
-        ]
+    # if 'window_gain' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot((bbr_values, bbr_total_values), plot_bbr_window, 'plot_bbr_window.pdf', 'Window Gain', '', len(bbr_values)),
+    #     ]
 
-    if 'pacing_gain' in plot_only and has_bbr:
-        plots += [
-            Plot((bbr_values, bbr_total_values), plot_bbr_pacing, 'plot_bbr_pacing.pdf', 'Pacing Gain', '', len(bbr_values))
-        ]
+    # if 'pacing_gain' in plot_only and has_bbr:
+    #     plots += [
+    #         Plot((bbr_values, bbr_total_values), plot_bbr_pacing, 'plot_bbr_pacing.pdf', 'Pacing Gain', '', len(bbr_values))
+    #     ]
 
-    has_bbr2 = False
-    for i in bbr2_values:
-        if len(bbr2_values[i][0]) > 0:
-            has_bbr2 = True
-            break
+    # has_bbr2 = False
+    # for i in bbr2_values:
+    #     if len(bbr2_values[i][0]) > 0:
+    #         has_bbr2 = True
+    #         break
 
-    if 'bw_lo_hi' in plot_only and has_bbr2:
-        plots += [
-            Plot(bbr2_values, plot_bw_lo_hi, 'plot_bw_lo_hi.pdf', 'BBR2 BW Lo and Hi', 'bit', len(bbr2_values)),
-        ]
+    # if 'bw_lo_hi' in plot_only and has_bbr2:
+    #     plots += [
+    #         Plot(bbr2_values, plot_bw_lo_hi, 'plot_bw_lo_hi.pdf', 'BBR2 BW Lo and Hi', 'bit', len(bbr2_values)),
+    #     ]
 
-    if 'inflight_lo_hi' in plot_only and has_bbr2:
-        plots += [
-            Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'MSS', len(bbr2_values)),
-        ]
+    # if 'inflight_lo_hi' in plot_only and has_bbr2:
+    #     plots += [
+    #         Plot(bbr2_values, plot_inflight_lo_hi, 'plot_inflight_lo_hi.pdf', 'BBR2 Inflight Lo and Hi', 'MSS', len(bbr2_values)),
+    #     ]
 
     if all_plots:
         for plot in plots:
@@ -246,7 +247,7 @@ def plot_throughput(data, p_plt):
     for c in retransmissions:
         data = retransmissions[c]
         p_plt.plot(data, np.zeros_like(data), '.', color='red')
-    p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=5))  # Adjust the base value as needed
+    #p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=40))  # Adjust the base value as needed
 
 
 def plot_sending_rate(data, p_plt):
@@ -269,7 +270,7 @@ def plot_sending_rate(data, p_plt):
     for c in retransmissions:
         data = retransmissions[c]
         p_plt.plot(data, np.zeros_like(data), '.', color='red')
-    p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=5))  # Adjust the base value as needed
+    #p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=0.5))  # Adjust the base value as needed
 
 def plot_fairness(fairness, p_plt):
     for c in fairness:
@@ -380,9 +381,10 @@ def plot_cwnd(data, p_plt):
         cwnd = cwnd_data[c]
         p_plt.plot(cwnd[0], cwnd[1], label='Flow {} cwnd'.format(c+1), color=colors[i % len(colors)])
         p_plt.plot(cwnd[0], cwnd[2], ':', color=colors[i % len(colors)])
+
     for c in inflight_data:
         inflight = inflight_data[c]
-        #data = filter_smooth(data, 5, 1)
+        inflight = filter_smooth(inflight, 5, 1)
 
         inflight_data_divided = [x / 8 for x in inflight[1]]
 
@@ -403,12 +405,14 @@ def plot_retransmissions(ret_interval, p_plt):
         data = ret_interval[c]
         total_loss = int(sum(data[1]))
         total_sum += total_loss
-        p_plt.bar(plot_sum[0], plot_sum[1], plot_sum[0][1], label=total_loss)
+        p_plt.bar(plot_sum[0], plot_sum[1], plot_sum[0][1], label='Loss for flow {}'.format(c))
         for i, value in enumerate(data[0]):
             if value in plot_sum[0]:
                 plot_sum[1][plot_sum[0].index(value)] -= data[1][i]
 
     p_plt.bar(plot_sum[0], plot_sum[1], plot_sum[0][1], label='Total {}'.format(total_sum), color='black')
+    p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=25))
+    p_plt.legend()
 
 
 def plot_retransmission_rate(ret_interval, p_plt):
@@ -430,7 +434,8 @@ def plot_retransmission_rate(ret_interval, p_plt):
             p_plt.plot(ts, rate, label='Total Retransmission Rate', color='black')
         else:
             p_plt.plot(ts, rate, label='{}'.format(c), alpha=0.3)
-
+    p_plt.yaxis.set_major_locator(ticker.MultipleLocator(base=10))
+    p_plt.set_ylim(ymax=50)
     p_plt.set_ylim(ymin=0)
 
 
