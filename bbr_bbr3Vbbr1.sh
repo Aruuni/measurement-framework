@@ -14,7 +14,3 @@ do
 done
 
 wait
-
-
-
-#shutdown now
