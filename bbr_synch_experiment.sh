@@ -14,7 +14,3 @@ do
 done
 
 wait
-
-# cp -r test /media/mihai/WD_BLACK/testRESULTS
-
-#shutdown now
