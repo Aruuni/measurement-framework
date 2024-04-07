@@ -258,7 +258,8 @@ def plot_sending_rate(data, p_plt):
     if total > 1 and PLOT_TOTAL:
         data = sending_rate[total]
         data = filter_smooth(data, 5, 2)
-        p_plt.plot(data[0], data[1], label='Total', color='#444444')
+        sending_rate_mbps = [x / (10 ** 6) for x in data[1]]
+        p_plt.plot(data[0], sending_rate_mbps, label='Total', color='#444444')
 
     for c in sending_rate:
         data = list(sending_rate[c])
